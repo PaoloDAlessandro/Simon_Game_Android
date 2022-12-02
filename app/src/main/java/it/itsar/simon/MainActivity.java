@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             sequenceArray.add(colori[index].getNome());
             setTimeout(() -> {
                 playSound(colori[findIndex(sequenceArray.get(indice))]);
-                }, 800);
+                }, 500);
     }
 
     private void reset() {
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             else {
                 setTimeout(() -> {
                     takeUserInput();
-                }, 3000);
+                }, 1600);
             }
         }
     }
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     this.runOnUiThread(()-> {
                         colori[finalI].getButton().setAlpha((float)0.6);
                     });
-                }, 600);
+                }, 500);
             });
         }
     }
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     this.runOnUiThread(() -> {
                         color.getButton().setAlpha((float)0.6);
                     });
-                }, 600
+                }, 500
         );
     }
 
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         if(indice < sequenceArray.size()) {
             setTimeout(() -> {
                 playSound(colori[findIndex(sequenceArray.get(indice))]);
-            }, 800);
+            }, 500);
         }
         else {
             userSequence();
