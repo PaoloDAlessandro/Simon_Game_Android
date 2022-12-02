@@ -6,16 +6,18 @@ import android.media.AudioTrack;
 import android.widget.Button;
 
 public class Colore {
-    String nome;
-    int freqHz;
-    int durationMs;
-    Button button;
+    private String nome;
+    private int freqHz;
+    private int durationMs;
+    private Button button;
+    private int color;
 
-    public Colore(String nome, int freqHz, int durationMs) {
+    public Colore(String nome, int freqHz, int durationMs, Button btn, int color) {
         this.nome = nome;
         this.freqHz = freqHz;
         this.durationMs = durationMs;
-        this.button = null;
+        this.button = btn;
+        this.color = color;
     }
 
     private AudioTrack generateTone(double freqHz, int durationMs)
@@ -39,14 +41,6 @@ public class Colore {
         tone.play();
     }
 
-    public void changeColor() {
-        this.button.setAlpha(1);
-        setTimeout(() -> {
-            this.button.setAlpha((float)0.6);
-            }, 600
-        );
-    }
-
     public String getNome() {
         return nome;
     }
@@ -59,15 +53,11 @@ public class Colore {
         return durationMs;
     }
 
-    public static void setTimeout(Runnable runnable, int delay) {
-        new Thread( () -> {
-            try {
-                Thread.sleep(delay);
-                runnable.run();
-            }
-            catch (Exception e) {
-                System.err.println(e);
-            }
-        }).start();
+    public Button getButton() {
+        return button;
+    }
+
+    public int getColor() {
+        return color;
     }
 }

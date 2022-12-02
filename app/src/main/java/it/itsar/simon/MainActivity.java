@@ -22,16 +22,14 @@ public class MainActivity extends AppCompatActivity {
 
     protected ActivityMainBinding binding;
 
-    private Colore[] colori = {new Colore("red", 329, 250), new Colore("green", 391, 250), new Colore("blue", 195, 250), new Colore("yellow", 261, 250)};
+    private Colore[] colori;
 
     private ArrayList<String> sequenceArray = new ArrayList<String>();
 
     private ArrayList<String> userSequence = new ArrayList<String>();
 
     private int score = 0;
-
     private int indice = 0;
-
     private int indiceUtente = 1;
 
     @Override
@@ -39,68 +37,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        binding.greenButton.setBackgroundColor(Color.GREEN);
-        binding.redButton.setBackgroundColor(Color.RED);
-        binding.yellowButton.setBackgroundColor(Color.YELLOW);
-        binding.blueButton.setBackgroundColor(Color.BLUE);
+        colori = new Colore[]{new Colore("red", 329, 250, binding.redButton, Color.RED), new Colore("green", 391, 250, binding.greenButton, Color.GREEN), new Colore("blue", 195, 250, binding.blueButton, Color.BLUE), new Colore("yellow", 261, 250, binding.yellowButton, Color.YELLOW)};
 
-        binding.redButton.setAlpha((float)0.6);
-        binding.yellowButton.setAlpha((float)0.6);
-        binding.blueButton.setAlpha((float)0.6);
-        binding.greenButton.setAlpha((float)0.6);
-
-        binding.greenButton.setOnClickListener(view -> {
-            binding.greenButton.setAlpha(1);
-            colori[1].play();
-            userSequence.add("green");
-            setTimeout(() -> {
-                        this.runOnUiThread(() -> {
-                            binding.greenButton.setAlpha((float)0.6);
-                        });
-                    }, 600
-            );
-            Log.d("sequenceUser:", userSequence.toString());
-
-        });
-
-        binding.yellowButton.setOnClickListener(view -> {
-            binding.yellowButton.setAlpha(1);
-            colori[3].play();
-            userSequence.add("yellow");
-            Log.d("sequenceUser:", userSequence.toString());
-            setTimeout(() -> {
-                        this.runOnUiThread(() -> {
-                            binding.yellowButton.setAlpha((float)0.6);
-                        });
-                    }, 600
-            );
-        });
-
-        binding.blueButton.setOnClickListener(view -> {
-            binding.blueButton.setAlpha(1);
-            colori[2].play();
-            userSequence.add("blue");
-            Log.d("sequenceUser:", userSequence.toString());
-            setTimeout(() -> {
-                        this.runOnUiThread(() -> {
-                            binding.blueButton.setAlpha((float)0.6);
-                        });
-                    }, 600
-            );
-        });
-
-        binding.redButton.setOnClickListener(view -> {
-            binding.redButton.setAlpha(1);
-            colori[0].play();
-            userSequence.add("red");
-            Log.d("sequenceUser:", userSequence.toString());
-            setTimeout(() -> {
-                        this.runOnUiThread(() -> {
-                            binding.redButton.setAlpha((float)0.6);
-                        });
-                    }, 600
-            );
-        });
+        setBackGroundColor();
+        addClickListeners();
 
         binding.playButton.setOnClickListener(view -> {
             binding.score.setText("Your score: " + score);
@@ -126,18 +66,20 @@ public class MainActivity extends AppCompatActivity {
         userSequence.clear();
     }
 
-    private void userSequence() {
-        Log.d("sequenceUser:", userSequence.toString());
-        Log.d("sequenceArray:", sequenceArray.toString());
-        Log.d("indiceUtente:", String.valueOf(indiceUtente));
+    private void setBackGroundColor() {
+        for (int i = 0; i < colori.length; i++) {
+            colori[i].getButton().setBackgroundColor(colori[i].getColor());
+            colori[i].getButton().setAlpha((float)0.6);
+        }
+    }
 
+    private void userSequence() {
         if(userSequence.equals(sequenceArray) && userSequence.size() == sequenceArray.size()) {
             score++;
             this.runOnUiThread(() -> {
                 binding.score.setText("Your score: " + score);
             });
             userSequence.clear();
-            System.out.println("LETSGOOOOOOOOOO");
             indiceUtente = 1;
             indice = 0;
             play();
@@ -155,14 +97,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void takeUserInput() {
-        Log.d("indiceUtenteTAKEUSER:", String.valueOf(indiceUtente));
-
         if(userSequence.size() >= indiceUtente) {
             indiceUtente++;
             userSequence();
         }
         else {
             gameOver();
+        }
+    }
+
+    private void addClickListeners() {
+        for (int i = 0; i < colori.length; i++) {
+            int finalI = i;
+            colori[i].getButton().setOnClickListener(view -> {
+                colori[finalI].getButton().setAlpha(1);
+                colori[finalI].play();
+                userSequence.add(colori[finalI].getNome());
+                setTimeout(() -> {
+                    this.runOnUiThread(()-> {
+                        colori[finalI].getButton().setAlpha((float)0.6);
+                    });
+                }, 600);
+            });
         }
     }
 
@@ -195,50 +151,19 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void changeButtonAlpha(Colore color) {
+        color.getButton().setAlpha(1);
+        setTimeout(() -> {
+                    this.runOnUiThread(() -> {
+                        color.getButton().setAlpha((float)0.6);
+                    });
+                }, 600
+        );
+    }
+
     private void playSound(Colore color) {
         color.play();
-        switch(color.nome) {
-            case "green":
-                binding.greenButton.setAlpha(1);
-                setTimeout(() -> {
-                            this.runOnUiThread(() -> {
-                                binding.greenButton.setAlpha((float)0.6);
-                            });
-                        }, 600
-                );
-                break;
-
-            case "red":
-                binding.redButton.setAlpha(1);
-                setTimeout(() -> {
-                            this.runOnUiThread(() -> {
-                                binding.redButton.setAlpha((float)0.6);
-                            });
-                        }, 600
-                );
-                break;
-
-            case "blue":
-                binding.blueButton.setAlpha(1);
-                setTimeout(() -> {
-                            this.runOnUiThread(() -> {
-                                binding.blueButton.setAlpha((float)0.6);
-                            });
-                        }, 600
-                );
-                break;
-
-            case "yellow":
-                binding.yellowButton.setAlpha(1);
-                setTimeout(() -> {
-                            this.runOnUiThread(() -> {
-                                binding.yellowButton.setAlpha((float)0.6);
-                            });
-                        }, 600
-                );
-                break;
-        }
-
+        changeButtonAlpha(color);
         indice++;
         if(indice < sequenceArray.size()) {
             setTimeout(() -> {
