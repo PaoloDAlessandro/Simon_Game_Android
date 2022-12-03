@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int score = 0;
     private int indice = 0;
+    private int nClicks = 0;
     private int indiceUtente = 1;
 
     @Override
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reset() {
+        nClicks = 0;
         indice = 0;
         indiceUtente = 1;
         score = 0;
@@ -74,12 +76,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void userSequence() {
+        Log.d("Sequence:", sequenceArray.toString());
+        Log.d("UserSequence:", userSequence.toString());
         if(userSequence.equals(sequenceArray) && userSequence.size() == sequenceArray.size()) {
             score++;
             this.runOnUiThread(() -> {
                 binding.score.setText("Your score: " + score);
             });
             userSequence.clear();
+            nClicks = 0;
             indiceUtente = 1;
             indice = 0;
             play();
@@ -97,12 +102,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void takeUserInput() {
-        if(userSequence.size() >= indiceUtente) {
-            indiceUtente++;
-            userSequence();
+        if(nClicks > sequenceArray.size()) {
+            gameOver();
         }
         else {
-            gameOver();
+            if (userSequence.size() >= indiceUtente && userSequence.equals(sequenceArray.subList(0, nClicks))) {
+                indiceUtente++;
+                userSequence();
+            } else {
+                gameOver();
+            }
         }
     }
 
@@ -111,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             int finalI = i;
             colori[i].getButton().setOnClickListener(view -> {
                 colori[finalI].getButton().setAlpha(1);
+                nClicks++;
                 colori[finalI].play();
                 userSequence.add(colori[finalI].getNome());
                 setTimeout(() -> {
@@ -171,7 +181,9 @@ public class MainActivity extends AppCompatActivity {
             }, 500);
         }
         else {
-            userSequence();
+            setTimeout(() -> {
+                userSequence();
+            }, 1000);
         }
     }
 }
