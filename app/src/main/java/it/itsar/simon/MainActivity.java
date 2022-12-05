@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+
 import java.util.ArrayList;
 import it.itsar.simon.databinding.ActivityMainBinding;
 
@@ -18,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int score = 0;
     private int indice = 0;
-    private int indiceUtente = 1;
+    private int nClicks = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +36,19 @@ public class MainActivity extends AppCompatActivity {
 
         setBackGroundColor();
         addClickListeners();
+        disableButtons();
 
         binding.playButton.setOnClickListener(view -> {
-            binding.score.setText("Your score: " + score);
             binding.playButton.setEnabled(false);
             reset();
+            updateScore();
+            enableButtons();
             play();
         });
     }
 
     private void play() {
+        userSequence.clear();
         int index = (int)(Math.random() * colori.length);
         sequenceArray.add(colori[index].getNome());
         setTimeout(() -> playSound(colori[findIndex(sequenceArray.get(indice))]), 500);
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void reset() {
         indice = 0;
-        indiceUtente = 1;
+        nClicks = 0;
         score = 0;
         sequenceArray.clear();
         userSequence.clear();
@@ -64,32 +69,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void userSequence() {
-        if(userSequence.equals(sequenceArray)) {
-            score++;
-            this.runOnUiThread(() -> binding.score.setText("Your score: " + score));
-            userSequence.clear();
-            indiceUtente = 1;
-            indice = 0;
-            play();
-        }
-        else {
-            if(userSequence.size() >= sequenceArray.size()) {
-                gameOver();
-            }
-            else {
-                setTimeout(() -> takeUserInput(), 1200);
-            }
+    private void enableButtons() {
+        for(Colore colore : colori) {
+            colore.getButton().setEnabled(true);
         }
     }
 
-    private void takeUserInput() {
-        if(userSequence.size() >= indiceUtente) {
-            indiceUtente++;
-            userSequence();
-        }
-        else {
-            gameOver();
+    private void disableButtons() {
+        for(Colore colore : colori) {
+            colore.getButton().setEnabled(false);
         }
     }
 
@@ -97,20 +85,49 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < colori.length; i++) {
             int finalI = i;
             colori[i].getButton().setOnClickListener(view -> {
+                userSequence.add(colori[finalI].getNome());
+                nClicks++;
+                if(!(userSequence.equals(sequenceArray.subList(0, nClicks)))) {
+                    gameOver();
+                }
+                if(userSequence.equals(sequenceArray) && sequenceArray.size() > 0) {
+                    win();
+                }
                 colori[finalI].getButton().setAlpha(1);
                 colori[finalI].play();
-                userSequence.add(colori[finalI].getNome());
-                setTimeout(() -> this.runOnUiThread(()-> colori[finalI].getButton().setAlpha((float)0.5)), 500);
+                setTimeout(() -> this.runOnUiThread(()-> colori[finalI].getButton().setAlpha((float)0.5)), 400);
+                final int finalnCliks = nClicks;
+                setTimeout(() -> checkClick(finalnCliks), 1500);
             });
         }
     }
 
+    private void checkClick(int preClick) {
+        preClick++;
+        if(nClicks < preClick && nClicks != 0) {
+            gameOver();
+        }
+    }
+
     private void gameOver() {
-        this.runOnUiThread(() -> {
+        this.runOnUiThread(()-> {
             binding.score.setText("Game over");
             binding.playButton.setEnabled(true);
+            disableButtons();
         });
         reset();
+    }
+
+    private void updateScore() {
+        this.binding.score.setText("Your score: " + score);
+    }
+
+    private void win() {
+        nClicks = 0;
+        indice = 0;
+        score++;
+        updateScore();
+        play();
     }
 
     public int findIndex(String nome) {
@@ -146,9 +163,6 @@ public class MainActivity extends AppCompatActivity {
         indice++;
         if(indice < sequenceArray.size()) {
             setTimeout(() -> playSound(colori[findIndex(sequenceArray.get(indice))]), 500);
-        }
-        else {
-            setTimeout(() -> userSequence(), 1000);
         }
     }
 }
