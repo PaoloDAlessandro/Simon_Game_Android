@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         indice = 0;
         score++;
         updateScore();
-        play();
+        setTimeout(()-> play(), 500);
     }
 
     public int findIndex(String nome) {
