@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void play() {
+        this.runOnUiThread(this::disableButtons);
         userSequence.clear();
         int index = (int)(Math.random() * colori.length);
         sequenceArray.add(colori[index].getNome());
@@ -163,6 +164,9 @@ public class MainActivity extends AppCompatActivity {
         indice++;
         if(indice < sequenceArray.size()) {
             setTimeout(() -> playSound(colori[findIndex(sequenceArray.get(indice))]), 500);
+        }
+        else {
+            this.runOnUiThread(this::enableButtons);
         }
     }
 }
